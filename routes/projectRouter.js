@@ -23,6 +23,7 @@ router.get('/resources', (req, res) => {
         })
 })
 
+// POST a resource
 router.post('/resources', (req, res) => {
     const resource = req.body;
     db.addResource(resource)
@@ -35,4 +36,29 @@ router.post('/resources', (req, res) => {
         })
 })
 
+// GET all projects
+router.get('/', (req, res) => {
+    db.getAllProjects()
+        .then(projects => {
+            res.status(200).json(projects)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({error: "Unable to get project list from server."})
+        })
+})
+
+
+// GET tasks for a project
+router.get('/:id/tasks', (req, res) => {
+    const {id} = req.params;
+    db.getTasksByProject(id)
+        .then(tasks => {
+            res.status(200).json(tasks)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({error: "Unable to get task list from server."})
+        })
+})
 module.exports = router
