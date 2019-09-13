@@ -100,9 +100,9 @@ function getAllTasks() {
 }
 
 function getProjectById(id) {
-    const projectQuery = db(`projects`)
+    const projectQuery = db(`projects`) // stores base query we'll be returning as amodified whole later
         .where({ id })
-        .then(item => {
+        .then(item => { // converts "completed" to show true or false, not 0 or 1
             return item.map(a => {
                 if (a.completed === 1) {
                     return {
@@ -113,9 +113,9 @@ function getProjectById(id) {
             })
         })
         
-    return Promise.all([projectQuery, getTasksByProject(id), getResourcesByProject(id)])
+    return Promise.all([projectQuery, getTasksByProject(id), getResourcesByProject(id)]) // make all db calls, which are all promises
         .then(([project, tasks, resources]) => {
-            // const newResources = resources
+            // do all the promises at once and manipulate the data returned into a new object
             const newTasks = tasks.map(task => {
                     return {
                         step_number: task.step_number,
