@@ -47,10 +47,28 @@ exports.up = function(knex) {
             .onDelete('CASCADE');
         tbl.primary(['project_id', 'task_id'])
     })
+    .createTable('project_resources', tbl => {
+        tbl.integer('project_id')
+            .notNullable()
+            .unsigned()
+            .references('id')
+            .inTable('projects')
+            .onUpdate('CASCADE')
+            .onDelete('CASCADE');
+        tbl.integer('resource_id')
+            .notNullable()
+            .unsigned()
+            .references('id')
+            .inTable('resources')
+            .onUpdate('CASCADE')
+            .onDelete('CASCADE');
+        tbl.primary(['project_id', 'resource_id'])
+    })
 };
 
 exports.down = function(knex) {
   return knex.schema
+    .dropTableIfExists('project_resources')
     .dropTableIfExists('project_tasks')
     .dropTableIfExists('resources')
     .dropTableIfExists('tasks')
