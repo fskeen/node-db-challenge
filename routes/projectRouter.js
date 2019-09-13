@@ -75,7 +75,6 @@ router.get('/:id/tasks', (req, res) => {
 })
 
 router.get('/tasks', (req, res) => {
-    const {id} = req.params;
     db.getAllTasks()
         .then(tasks => {
             res.status(200).json(tasks)
@@ -90,12 +89,26 @@ router.get('/tasks', (req, res) => {
 router.post('/:id/tasks', (req, res) => {
     const task = req.body;
     db.addTask(task)
-        .then(addedtask => {
-            res.status(201).json(addedtask)
+        .then(list => {
+            res.status(201).json(list)
         })
         .catch(err => {
             console.log(err)
             res.status(500).json({error: "Unable to add task to server."})
+        })
+})
+
+// Get project by ID
+
+router.get('/:id', (req, res) => {
+    const {id} = req.params;
+    db.getProjectById(id)
+        .then(project => {
+            res.status(200).json(project)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({error: "Unable to retrieve project from the server."})
         })
 })
 

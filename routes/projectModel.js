@@ -7,7 +7,8 @@ module.exports = {
     getAllProjects,
     addTask,
     getTasksByProject,
-    getAllTasks
+    getAllTasks,
+    getProjectById
 }
 
 // helpers for model functions
@@ -15,10 +16,7 @@ function getResourceById(id) {
     return db(`resources`)
     .where({ id })
 }
-function getProjectById(id) {
-    return db(`projects`)
-    .where({ id })
-}
+
 function getTaskById(id) {
     return db(`tasks`)
     .where({ id })
@@ -91,6 +89,43 @@ function getTasksByProject(id) {
         })
 }
 
+function getResourcesByProject(id) {
+    return db('project_resources')
+    .select('resources.id as resource_id','resource_name').join('resources', 'resources.id', 'project_resources.resource_id' )
+        .where({project_id: id})
+}
+
 function getAllTasks() {
     return db('tasks')
+}
+
+function getProjectById(id) {
+    const projectQuery = db(`projects`)
+        .where({ id })
+        .then(item => {
+            return item.map(a => {
+                if (a.completed === 1) {
+                    return {
+                        ...a, completed: true}
+                } else {
+                    return {...a, completed: false}
+                }
+            })
+        })
+        
+    return Promise.all([projectQuery, getTasksByProject(id), getResourcesByProject(id)])
+        .then(([project, tasks, resources]) => {
+            // const newResources = resources
+            const newTasks = tasks.map(task => {
+                    return {
+                        step_number: task.step_number,
+                        task_name: task.task_name,
+                        task_notes: task.task_notes,
+                        completed: task.completed
+                    }
+                })
+            project[0].tasks = newTasks
+            project[0].resources = resources
+            return project[0]
+        })
 }
