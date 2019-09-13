@@ -74,11 +74,10 @@ function addTask(task) {
 }
 
 function getTasksByProject(id) {
-    return db('project_tasks')
+    return db('projects')
         .select("project_name", "project_desc", "task_name", "task_notes", "step_number", "tasks.completed")
-        .join('projects', 'projects.id', 'project_tasks.project_id')
-        .join('tasks', 'tasks.id', 'task_id')
-        .where({"project_tasks.project_id": id})
+        .join('tasks', 'project_id', 'projects.id')
+        .where({"projects.id": id})
         .orderBy("step_number", "asc")
         .then(list => {
             return list.map(a => {
