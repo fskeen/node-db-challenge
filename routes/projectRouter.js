@@ -3,11 +3,11 @@ const db = require('./projectModel');
 const router = express.Router();
 
 /**
- * POST a resource
- * GET all resources
- * POST a project
- * GET all projects, incl. name, desc, completed
- * POST a task
+ * POST a resource DONE
+ * GET all resources DONE
+ * POST a project DONE
+ * GET all projects, incl. name, desc, completed DONE
+ * POST a task DONE
  * GET all tasks for a project, incl. project name, description, and completed
 */
 
@@ -48,6 +48,18 @@ router.get('/', (req, res) => {
         })
 })
 
+// POST a project
+router.post('/', (req, res) => {
+    const project = req.body;
+    db.addProject(project)
+        .then(addedproject => {
+            res.status(201).json(addedproject)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({error: "Unable to add project to server."})
+        })
+})
 
 // GET tasks for a project
 router.get('/:id/tasks', (req, res) => {
@@ -61,4 +73,32 @@ router.get('/:id/tasks', (req, res) => {
             res.status(500).json({error: "Unable to get task list from server."})
         })
 })
+
+router.get('/tasks', (req, res) => {
+    const {id} = req.params;
+    db.getAllTasks()
+        .then(tasks => {
+            res.status(200).json(tasks)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({error: "Unable to get task list from server."})
+        })
+})
+
+// POST task
+router.post('/:id/tasks', (req, res) => {
+    const task = req.body;
+    db.addTask(task)
+        .then(addedtask => {
+            res.status(201).json(addedtask)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({error: "Unable to add task to server."})
+        })
+})
+
+
+
 module.exports = router

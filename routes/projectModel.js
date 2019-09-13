@@ -6,7 +6,8 @@ module.exports = {
     addProject,
     getAllProjects,
     addTask,
-    getTasksByProject
+    getTasksByProject,
+    getAllTasks
 }
 
 // helpers for model functions
@@ -44,7 +45,7 @@ function getAllResources() {
     return db('resources')
 }
 
-function addProject() {
+function addProject(project) {
     const table = 'projects'
     return db(table)
         .insert(project)
@@ -53,9 +54,19 @@ function addProject() {
 
 function getAllProjects() {
     return db('projects')
+    .then(list => {
+        return list.map(a => {
+            if (a.completed === 1) {
+                return {
+                    ...a, completed: true}
+            } else {
+                return {...a, completed: false}
+            }
+        })
+    })
 }
 
-function addTask() {
+function addTask(task) {
     const table = 'tasks'
     return db(table)
         .insert(task)
@@ -64,9 +75,23 @@ function addTask() {
 
 function getTasksByProject(id) {
     return db('project_tasks')
-        .select("project_name", "project_desc", "task_name", "task_notes", "step_number")
+        .select("project_name", "project_desc", "task_name", "task_notes", "step_number", "tasks.completed")
         .join('projects', 'projects.id', 'project_tasks.project_id')
         .join('tasks', 'tasks.id', 'task_id')
         .where({"project_tasks.project_id": id})
         .orderBy("step_number", "asc")
+        .then(list => {
+            return list.map(a => {
+                if (a.completed === 1) {
+                    return {
+                        ...a, completed: true}
+                } else {
+                    return {...a, completed: false}
+                }
+            })
+        })
+}
+
+function getAllTasks() {
+    return db('tasks')
 }
